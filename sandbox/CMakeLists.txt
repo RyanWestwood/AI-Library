@@ -16,7 +16,7 @@ endforeach()
 
 add_executable(${PROJECT_NAME} ${SOURCE})
 
-find_package(SDL2 REQUIRED PATHS C:/Users/ryan/Documents/Git/AI-Library/library_binaries)
+find_package(SDL2 REQUIRED PATHS ${PROJECT_SOURCE_DIR}/../library_binaries)
 find_package(SDL2_IMAGE REQUIRED PATHS ${PROJECT_SOURCE_DIR}/../library_binaries)
 
 set(LIB_FILES 
@@ -24,6 +24,13 @@ set(LIB_FILES
     "${PROJECT_SOURCE_DIR}/../library_binaries/lib/SDL2_image.lib"
     "${PROJECT_SOURCE_DIR}/../library_binaries/lib/AIL.lib"
 ) 
+
+add_custom_command(TARGET Sandbox
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/../library_binaries/bin/SDL2.dll ${Sandbox_BINARY_DIR}/.
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/../library_binaries/bin/SDL2_image.dll ${Sandbox_BINARY_DIR}/.
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/../library_binaries/bin/AIL.dll ${Sandbox_BINARY_DIR}/.
+)
 
 include_directories(${PROJECT_SOURCE_DIR}/../library_binaries/include)
 target_link_libraries(${PROJECT_NAME} ${LIB_FILES})

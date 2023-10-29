@@ -8,30 +8,30 @@ namespace ai
   {
     namespace
     {
-      auto Heuristic = [](Node* current, Node* destination) {
-        auto current_pos     = current->GetPosition();
-        auto destination_pos = destination->GetPosition();
+      auto Heuristic = [](Node* current, Node* destination) -> float {
+        const Vector2& current_pos     = current->GetPosition();
+        const Vector2& destination_pos = destination->GetPosition();
 
-        float xDist = std::abs(current_pos.x - destination_pos.x);
-        float yDist = std::abs(current_pos.y - destination_pos.y);
+        const float xDist = std::fabs(current_pos.x - destination_pos.x);
+        const float yDist = std::fabs(current_pos.y - destination_pos.y);
 
         return (xDist * xDist) + (yDist * yDist);
       };
 
-      auto Compare = [](const Node* lhs, const Node* rhs) {
+      auto Compare = [](const Node* lhs, const Node* rhs) -> const bool{
         return lhs->m_Costs.m_TotalCost > rhs->m_Costs.m_TotalCost;
       };
     } // namespace
 
     std::vector<Vector2> A_Star(std::vector<Node*>& node_map,
                                 Node*               start_node,
-                                Node*               end_node,
+                                Node*               goal_node,
                                 Obstacle            layer)
     {
       ResetNodeMap(node_map);
 
       start_node->m_Costs.m_FromCost  = 0.f;
-      start_node->m_Costs.m_ToCost    = Heuristic(start_node, end_node);
+      start_node->m_Costs.m_ToCost    = Heuristic(start_node, goal_node);
       start_node->m_Costs.m_TotalCost = start_node->m_Costs.m_FromCost + start_node->m_Costs.m_ToCost;
 
       std::vector<Node*> frontier;
@@ -42,7 +42,7 @@ namespace ai
       {
         std::pop_heap(frontier.begin(), frontier.end(), Compare);
         Node* current_node = frontier.back();
-        if(AtGoal(current_node, end_node))
+        if(AtGoal(current_node, goal_node))
         {
           return SolutionPath(current_node);
         }
@@ -56,12 +56,12 @@ namespace ai
           if(!neighbour->IsObstacle(layer) &&
              !neighbour->IsVisited())
           {
-            float gPossibleLowerGoal = current_node->m_Costs.m_FromCost + Heuristic(neighbour, end_node);
+            const float gPossibleLowerGoal = current_node->m_Costs.m_FromCost + Heuristic(neighbour, goal_node);
             if(gPossibleLowerGoal < neighbour->m_Costs.m_FromCost)
             {
               neighbour->SetParent(current_node);
               neighbour->m_Costs.m_FromCost  = current_node->m_Costs.m_FromCost + 1;
-              neighbour->m_Costs.m_ToCost    = Heuristic(neighbour, end_node);
+              neighbour->m_Costs.m_ToCost    = Heuristic(neighbour, goal_node);
               neighbour->m_Costs.m_TotalCost = neighbour->m_Costs.m_FromCost + neighbour->m_Costs.m_ToCost;
               frontier.push_back(neighbour);
               std::push_heap(frontier.begin(), frontier.end(), Compare);
@@ -82,7 +82,7 @@ namespace ai
 
     std::vector<Vector2> A_StarStatic(std::vector<Node*>& node_map,
                                       Node*               start_node,
-                                      Node*               end_node,
+                                      Node*               goal_node,
                                       Obstacle            layer)
     {
       ResetNodeMap(node_map);
@@ -99,7 +99,7 @@ namespace ai
       {
         std::pop_heap(frontier.begin(), frontier.end(), Compare);
         Node* current_node = frontier.back();
-        if(AtGoal(current_node, end_node))
+        if(AtGoal(current_node, goal_node))
         {
           return SolutionPath(current_node);
         }
@@ -113,7 +113,7 @@ namespace ai
           if(!neighbour->IsObstacle(layer) &&
              !neighbour->IsVisited())
           {
-            float gPossibleLowerGoal = current_node->m_Costs.m_FromCost + neighbour->m_Costs.m_ToCost;
+            const float gPossibleLowerGoal = current_node->m_Costs.m_FromCost + neighbour->m_Costs.m_ToCost;
             if(gPossibleLowerGoal < neighbour->m_Costs.m_FromCost)
             {
               neighbour->SetParent(current_node);

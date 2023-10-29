@@ -1,12 +1,12 @@
 [submodule "external/googletest"]
 	path = external/googletest
 	url = https://github.com/google/googletest.git
-[submodule "external/sdl_2.24.2"]
-	path = external/sdl_2.24.2
-	url = https://github.com/libsdl-org/SDL.git
-[submodule "external/sdlimage_2.6.2"]
-	path = external/sdlimage_2.6.2
-	url = https://github.com/libsdl-org/SDL_image.git
 [submodule "external/googlebenchmark"]
 	path = external/googlebenchmark
 	url = https://github.com/google/benchmark.git
+[submodule "external/sdlimage_2.6.3"]
+	path = external/sdlimage_2.6.3
+	url = https://github.com/libsdl-org/SDL_image.git
+[submodule "external/sdl_2.28.1"]
+	path = external/sdl_2.28.1
+	url = https://github.com/libsdl-org/SDL.git

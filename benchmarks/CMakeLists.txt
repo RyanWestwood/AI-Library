@@ -14,3 +14,8 @@ link_directories(${GOOGLEBENCH_ROOT}/lib)
 add_executable(${PROJECT_NAME} main.cpp)
 target_link_libraries(${PROJECT_NAME} benchmark::benchmark)
 target_link_libraries(${PROJECT_NAME} "${PROJECT_DIRECTORY}/library_binaries/lib/AIL.lib")
+
+add_custom_command(TARGET AI_Benchmarks
+  POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/../library_binaries/bin/AIL.dll ${AI_Benchmarks_BINARY_DIR}/.
+)

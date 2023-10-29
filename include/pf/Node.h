@@ -42,7 +42,7 @@ namespace ai
         return m_Visited;
       }
 
-      Vector2 GetPosition() const
+      const Vector2& GetPosition() const
       {
         return m_Position;
       }

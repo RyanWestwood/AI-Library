@@ -6,9 +6,7 @@ namespace ai
   {
     bool AtGoal(Node* current, Node* destination)
     {
-      bool same_x = current->GetPosition().x == destination->GetPosition().x;
-      bool same_y = current->GetPosition().y == destination->GetPosition().y;
-      return same_x && same_y;
+      return current->GetPosition() == destination->GetPosition();
     };
 
     std::vector<Vector2> SimplifyPath(std::vector<Vector2>& path)

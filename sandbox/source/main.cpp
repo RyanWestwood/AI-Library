@@ -7,15 +7,15 @@
     solution_path = ai::path::algorithm(map, start_node, goal_node, layer); \
     break;
 
-constexpr int MAP_WIDTH  = 80;
-constexpr int MAP_HEIGHT = 45;
-constexpr int TILE_SIZE  = 16;
+constexpr static int MAP_WIDTH  = 80;
+constexpr static int MAP_HEIGHT = 45;
+constexpr static int TILE_SIZE  = 16;
 
 std::vector<Vector2> CreatePath(std::vector<ai::path::Node*>& map,
                                 Vector2                       start,
                                 Vector2                       goal,
                                 SearchAlgorithm               algorithm = SearchAlgorithm::A_Star,
-                                ai::path::Obstacle            layer     = ai::path::Obstacle::None)
+                                ai::path::Obstacle            layer     = ai::path::Obstacle::All)
 {
   ai::path::Node*      start_node = map.at(start.x + (start.y * MAP_WIDTH));
   ai::path::Node*      goal_node  = map.at(goal.x + (goal.y * MAP_WIDTH));
@@ -37,7 +37,7 @@ int main(int argc, char* args[])
 {
   auto renderer = InitializeRenderer(MAP_WIDTH * TILE_SIZE, MAP_HEIGHT * TILE_SIZE);
 
-  std::vector<ai::path::Node*> map = ai::path::CreateNodeMap(MAP_WIDTH, MAP_HEIGHT);
+  std::vector<ai::path::Node*> node_map = ai::path::CreateNodeMap(MAP_WIDTH, MAP_HEIGHT);
 
   TextureData white_block = LoadSolidColourTexture({255, 255, 255, 255}, {32, 32}, renderer.renderer);
   TextureData black_block = LoadSolidColourTexture({0, 0, 0, 255}, {32, 32}, renderer.renderer);
@@ -53,41 +53,40 @@ int main(int argc, char* args[])
   {
     SDL_RenderClear(renderer.renderer);
 
-    for(int y = 0; y < 45; y++)
+    // Create obstacles.
+    for(int i = 10; i < 30; i++)
     {
-      for(int x = 0; x < 80; x++)
-      {
-        SDL_Rect dest = {16 * x + offset, 16 * y + offset, 16 - offset, 16 - offset};
-        SDL_RenderCopy(renderer.renderer, white_block.m_Texture, &src, &dest);
-      }
+      //node_map.at(23 * MAP_WIDTH + i)->SetObstacle(ai::path::All);
     }
 
-    for(int i = 0; i < 66; i++)
-    {
-      map.at(23 * 80 + 7 + i)->SetObstacle(ai::path::All);
-    }
-    std::vector<Vector2> path = CreatePath(map, start, goal, SearchAlgorithm::A_Star, ai::path::All);
+    // Create path.
+    std::vector<Vector2> as_path = CreatePath(node_map, start, goal);
 
-    for(auto& node : map)
+    // Draw the map along with any obstacles. 
+    // Background = White
+    // Obstacle   = Red
+    for(auto& node : node_map)
     {
-      if(node->IsObstacle(ai::path::All))
-      {
-        auto     pos  = node->GetPosition();
-        SDL_Rect dest = {16 * pos.x + offset, 16 * pos.y + offset, 16 - offset, 16 - offset};
-        SDL_RenderCopy(renderer.renderer, red_block.m_Texture, &src, &dest);
-      }
+      const Vector2 pos       = node->GetPosition();
+      SDL_Rect      dest      = {TILE_SIZE * pos.x + offset, TILE_SIZE * pos.y + offset, TILE_SIZE - offset, TILE_SIZE - offset};
+      TextureData   xTileType = node->IsObstacle(ai::path::All) ? red_block : white_block;
+
+      SDL_RenderCopy(renderer.renderer, xTileType.m_Texture, &src, &dest);
     }
 
-    for(auto& pos : path)
+    // Draw path.
+    for(auto& pos : as_path)
     {
-      SDL_Rect dest = {16 * pos.x + offset, 16 * pos.y + offset, 16 - offset, 16 - offset};
+      SDL_Rect dest = {TILE_SIZE * pos.x + offset, TILE_SIZE * pos.y + offset, TILE_SIZE - offset, TILE_SIZE - offset};
       SDL_RenderCopy(renderer.renderer, blue_block.m_Texture, &src, &dest);
     }
 
-    SDL_Rect dest = {16 * start.x + offset, 16 * start.y + offset, 16 - offset, 16 - offset};
+    // Draw the start square, Green.
+    SDL_Rect dest = {TILE_SIZE * start.x + offset, TILE_SIZE * start.y + offset, TILE_SIZE - offset, TILE_SIZE - offset};
     SDL_RenderCopy(renderer.renderer, green_block.m_Texture, &src, &dest);
 
-    SDL_Rect dest1 = {16 * goal.x + offset, 16 * goal.y + offset, 16 - offset, 16 - offset};
+    // Draw the end square, Black.
+    SDL_Rect dest1 = {TILE_SIZE * goal.x + offset, TILE_SIZE * goal.y + offset, TILE_SIZE - offset, TILE_SIZE - offset};
     SDL_RenderCopy(renderer.renderer, black_block.m_Texture, &src, &dest1);
 
     SDL_RenderPresent(renderer.renderer);
